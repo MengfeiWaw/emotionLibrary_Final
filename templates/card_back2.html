@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+<!--{% block script %}-->
+<!--src="/static/js/sketch.js"-->
+<!--{% endblock %}-->
+
+{% block title %}
+    :Back
+{% endblock %}
+
+{% block main %}
+
+    <div id="myDiv">
+        <img src="/static/studytable.png" alt="studytable" style="width:80%;position:absolute;right:6%;bottom:12%;">
+
+        <div class="card">
+            <div class="row">
+                <div class="col-2" style="text-align:center">
+                    <h5><a href="/card_instructions">instructions</a></h5>
+                    <p>---------------</p>
+                    <h5><a href="/card_back">style 1</a></h5>
+                    <h5><a href="/card_back2">style 2</a></h5>
+                    <h5><a href="/card_back3">style 3</a></h5>
+                    <h5><a href="/card_back4">style 4</a></h5>
+                    <p>---------------</p>
+                    <h5><a href="/card_finished">finished!</a></h5>
+                    <p>---------------</p>
+                    <button class="button1" type="submit" style="padding:3px 10px;" onclick="window.location.href = '/firstcard_front';">Flip card</button>
+                </div>
+                <div class="col-10" style="border: 3px dotted #4F7D57;height:500px;" id="area">
+                <script src="/static/js/sketch2.js"></script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

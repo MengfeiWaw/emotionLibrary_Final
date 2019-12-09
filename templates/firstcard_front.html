@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    :First Card
+{% endblock %}
+
+{% block main %}
+    <img src="/static/studytable.png" alt="studytable" style="width:80%;position:absolute;right:6%;bottom:12%;">
+    <div>
+        <h2 class="main_instructions">It's your first time here. Please write this initial card!</h2>
+    </div>
+    <div class="card">
+        <form action="/firstcard_front" method="post">
+            <p class="text_title">Hello,</p>
+            <p class="text_title">I am a student studying at Harvard</p>
+            <select name="school">
+                <option value="College">College</option>
+                <option value="Business School">Business School</option>
+                <option value="Division of Continuing Education">Division of Continuing Education</option>
+                <option value="School of Dental Medicine">School of Dental Medicine</option>
+                <option value="Divinity School">Divinity School</option>
+                <option value="BFaculty of Arts and Sciences">Faculty of Arts and Sciences</option>
+                <option value="Graduate School of Design">Graduate School of Design</option>
+                <option value="Graduate School of Education">Graduate School of Education</option>
+                <option value="Graduate School of Arts & Sciences">Graduate School of Arts & Sciences</option>
+                <option value="John A. Paulson School of Engineering & Applied Sciences">John A. Paulson School of Engineering & Applied Sciences</option>
+                <option value="Kennedy School">Kennedy School</option>
+                <option value="Law School">Law School</option>
+                <option value="Medical School">Medical School</option>
+                <option value="Radcliffe Institute for Advanced Study">Radcliffe Institute for Advanced Study</option>
+                <option value="Radcliffe T.H. Chan School of Public Health">Radcliffe T.H. Chan School of Public Health</option>
+            </select>
+            <p class="text_title">I am writing this card at</p>
+            <input class="form-control" name="place" placeholder="My bedroom" type="text">
+            <p class="text_title">Generally, I feel</p>
+            <input class="form-control" name="feeling" placeholder="a feeling" type="text">
+            <p class="text_title">about my studying life, because</p>
+            <input class="form-control" name="reason" placeholder="reason description" type="text">
+            <p class="text_title">I wonder</p>
+            <input class="form-control" name="need" placeholder="things that would be helpful to you" type="text">
+            <p class="text_title">, that's why I am here.</p>
+            <button class="button1" type="submit" style="position:absolute;right:50%;transform:translate(50%,0%);">Save and flip card</button>
+        </form>
+    </div>
+{% endblock %}

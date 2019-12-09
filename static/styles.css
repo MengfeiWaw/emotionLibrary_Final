@@ -1,47 +1,208 @@
-nav .navbar-brand
-{
-    /* size for brand */
-    font-size: xx-large;
+.bgcolor{
+      background-color:#31B67B;
 }
 
-/* colors for brand */
-nav .navbar-brand .blue
-{
-    color: #537fbe;
-}
-nav .navbar-brand .red
-{
-    color: #ea433b;
-}
-nav .navbar-brand .yellow
-{
-    color: #f5b82e;
-}
-nav .navbar-brand .green
-{
-    color: #2e944b;
+.bgcolor1{
+      background-color:#1E4030;
 }
 
-main .form-control
-{
-    /* center form controls */
-    display: inline-block;
-
-    /* override Bootstrap's 100% width for form controls */
-    width: auto;
+.whitewall_left{
+      background-color:white;
+      position:absolute;
+      width:26%;
+      left:0%;
+      height:80%;
 }
 
-main
-{
-    /* scroll horizontally as needed */
-    overflow-x: auto;
-
-    /* center contents */
-    text-align: center;
+.whitewall_right{
+      background-color:white;
+      position:absolute;
+      width:26%;
+      right:0%;
+      height:80%;
 }
 
-main img
-{
-    /* constrain images on small screens */
-    max-width: 100%;
+.purplewall_left{
+      background-color:#64777D;
+      position:absolute;
+      width:26%;
+      left:0%;
+      height:80%;
+}
+
+.purplewall_left2{
+      background-color:#64777D;
+      position:absolute;
+      width:50%;
+      left:0%;
+      height:80%;
+}
+
+.yellowwall_right{
+      background-color:#FDCB66;
+      position:absolute;
+      width:26%;
+      right:0%;
+      height:80%;
+}
+
+.yellowwall_right2{
+      background-color:#FDCB66;
+      position:absolute;
+      width:50%;
+      right:0%;
+      height:80%;
+}
+
+.text_center{
+      text-align:center;
+      position:absolute;
+      top:10%;
+      width:100%;
+      color:white;
+}
+
+.sofaset{
+      width:48%;
+      position:absolute;
+      left:25%;
+      bottom:8%;
+}
+
+.leftwindow{
+      width:16%;
+      position:absolute;
+      left:5%;
+      bottom:23%;
+}
+
+.rightwindow{
+      width:16%;
+      position:absolute;
+      right:5%;
+      bottom:23%;
+}
+
+.deco{
+      width:30%;
+      position:absolute;
+      right:50%;
+      bottom:60%;
+      transform: translate(50%, -60%);
+}
+
+/*h1{*/
+/*      font-size:50px;*/
+/*}*/
+
+.button1 {
+  background-color: white;
+  color: #31B67B;
+  border: 4.5px solid #4F7D57;
+  border-radius: 25px;
+  padding: 3px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+  margin: 4px 2px;
+  -webkit-transition-duration: 0.4s; /* Safari */
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+.button1:hover {
+  background-color: #4F7D57;
+  color: white;
+}
+
+
+
+#logo {
+      width: 17%;
+      height: 17%;
+      position: absolute;
+      right: 0%;
+      top:0%;
+}
+
+.ground {
+      background-color:#1E4030;
+      position: absolute;
+      width: 100%;
+      height: 20%;
+      bottom:0%;
+}
+
+#dl-menu{
+      position: absolute;
+      left: 5%;
+      top: 5%;
+}
+
+#background{
+      height:936px;
+      width:100%;
+}
+
+#index{
+      background-image:url('indexBG_HomePage.jpg');
+      background-size:cover;
+      background-repeat:no-repeat;
+}
+
+.align-center{
+      text-align:center;
+}
+
+.rcorner_box {
+      background-color:white;
+      border-radius: 25px;
+      border: 3px solid #4F7D57;
+      padding: 20px;
+      width: 600px;
+      position: absolute;
+      top: 25%;
+      right:50%;
+      transform: translate(50%, 0%);
+}
+
+.text_title{
+      color:#31B67B;
+      font-size: 20px;
+}
+
+.main_instructions{
+      position:absolute;
+      top:15%;
+      left:30%;
+      color:white;
+}
+
+.card {
+      background-color:white;
+      border: 3px solid #4F7D57;
+      padding: 20px;
+      width: 1060px;
+      height:600px;
+      position: absolute;
+      top: 20%;
+      right:50%;
+      transform: translate(50%, 0%);
+}
+
+.smcard {
+      background-color:white;
+      border: 2px solid #4F7D57;
+      padding: 20px;
+      width: 265px;
+      height:150px;
+}
+
+div{
+      color:#31B67B;
+}
+
+.books{
+      float: left;
+      margin: 0px 0px 0px 0px;
 }

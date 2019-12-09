@@ -1,0 +1,21 @@
+{% extends "layout_floor.html" %}
+
+{% block title %}
+    :Card back
+{% endblock %}
+
+{% block main %}
+
+    <div id="myDiv">
+        <div class="card">
+            <div class="row">
+                <div class="col-2" style="text-align:center">
+                </div>
+                <div class="col-10" style="border: 3px dotted #4F7D57;height:500px;" id="area">
+                <iframe width="850" height="490" src="https://www.youtube.com/embed/0uyN3X5k_7o" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="button1" type="submit" style="position:absolute;top:77%; right:50%;transform:translate(50%, 0%);" onclick="window.location.href='/bookpage_front';">Flip card</button>
+{% endblock %}

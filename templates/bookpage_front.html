@@ -1,0 +1,15 @@
+{% extends "layout_floor.html" %}
+
+{% block title %}
+    :Card front
+{% endblock %}
+
+{% block main %}
+    <div class="card" style="padding:50px 50px;">
+            <p class="text_title">Hello, </p>
+            <p class="text_title">I am a student studying at Harvard {{cards[0]["hostschool"]}}.</p>
+            <p class="text_title">I am writing this card at {{cards[0]["place"]}}     .</p>
+            <p class="text_title">Generally, I feel {{cards[0]["feeling"]}} about my studying life, because {{cards[0]["reason"]}}. I wonder {{cards[0]["wonder"]}}. That's why I am here.</p>
+    </div>
+    <button class="button1" type="submit" style="position:absolute;top:75%; right:50%;transform:translate(50%, 0%);" onclick="window.location.href='/bookpage_back';">Flip card</button>
+{% endblock %}

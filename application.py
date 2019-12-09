@@ -4,12 +4,10 @@ from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
 from tempfile import mkdtemp
-from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, lookup, usd
+from helpers import apology, login_required
 
-# Configure application
 app = Flask(__name__)
 
 # Ensure templates are auto-reloaded
@@ -23,9 +21,6 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
-# Custom filter
-app.jinja_env.filters["usd"] = usd
-
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_PERMANENT"] = False
@@ -33,92 +28,50 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///finance.db")
-
-# Make sure API key is set
-if not os.environ.get("API_KEY"):
-    raise RuntimeError("API_KEY not set")
-
+db = SQL("sqlite:///emotionlibrary.db")
 
 @app.route("/")
-@login_required
 def index():
-    """Show portfolio of stocks"""
-    symbol_names = db.execute("SELECT symbol, SUM(shares) AS shares FROM history WHERE user_id = :user_id GROUP BY symbol HAVING SUM(shares) > 0", user_id = session["user_id"])
-    # print(symbol_names)
-    grandtotal = 0
-    for row in symbol_names:
-        q = lookup(row["symbol"])
-        row["price"] = q["price"]
-        row["name"] = q["name"]
-        rowtotal = row["price"] * row["shares"]
-        grandtotal += rowtotal
-        row["total"] = usd(rowtotal)
-        row["price"] = usd(q["price"])
-    temp = db.execute("SELECT cash FROM users WHERE id = :user_id", user_id = session["user_id"])
-    cash_left = temp[0]["cash"]
-    grandtotal += cash_left
-    # print(cash_left)
-    # row["total"] = usd(row["total"])
-    return render_template("index.html", symbol_names = symbol_names, cash_left = usd(cash_left), grandtotal = usd(grandtotal))
+    return render_template("index.html")
 
-
-@app.route("/buy", methods=["GET", "POST"])
-@login_required
-def buy():
-    """Buy shares of stock"""
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    """Register user"""
     if request.method == "GET":
-        return render_template("buy.html")
+        return render_template("register.html")
     else:
-        symbol = request.form.get("symbol")
-        if not symbol:
-            return apology("Please type in a symbol")
-        price = lookup(symbol)
-        if not price:
-            return apology("Invalide symbol")
-        price_value = price["price"]
-        # print(price_value)
-        # print(type(price_value))
-        shares_value = request.form.get("shares")
-        if not shares_value:
-            return apology("Please type in shares")
-        if not shares_value.isdigit():
-            return apology("Please type in a valid integer")
-        else:
-            shares = (int)(shares_value)
-        # print(shares)
-        # print(type(shares))
-        if shares <= 0:
-            return apology("Please type in a positive integer")
-        cash = db.execute("SELECT cash FROM users WHERE id = :user_id", user_id = session["user_id"])
-        print(cash)
-        cash_value = cash[0]["cash"]
-        print(cash_value)
-        print(type(cash_value))
-        #check if cash is enough to pay for shares
-        if cash_value >= price_value*shares:
-            #insert buying info to table
-            db.execute("INSERT INTO history(user_id, symbol, shares, price) VALUES (:user_id, :symbol, :shares, :price)", user_id = session["user_id"], symbol = symbol, shares = shares, price = price_value)
+        name = request.form.get("username")
+        print(name)
+        if not name:
+            return apology("You must type in a username")
+        # names = db.execute("SELECT username FROM users")
+        names = db.execute("SELECT username FROM users WHERE username = :username", username = name)
+        print(names)
+        # for i in range(len(names)):
+        #     if name == names[i]["username"]:
+        #         return apology("This username already exists")
+        if len(names) != 0:
+            return apology("This username already exists")
+        password = request.form.get("password")
+        if not password:
+            return apology("You must type in a password")
+        confirmation = request.form.get("confirmation")
+        if not confirmation:
+            return apology("You must type in confirmation")
+        if confirmation != password:
+            return apology("The passwords do not match")
+        email = request.form.get("email")
+        if not email:
+            return apology("You must type in an email")
+        userid = db.execute("INSERT INTO users (username, hash) VALUES (:username, :hash)", username = name, hash = generate_password_hash(password))
 
-            db.execute("UPDATE users SET cash = :cash_after WHERE id = :user_id", cash_after = cash_value - price_value*shares, user_id = session["user_id"])
-        else:
-            return apology("Not enough cash")
-        flash("Bought successfully!")
-    return redirect("/")
+        # Remember which user has logged in
+        session["user_id"] = userid
 
+        # flash("Registered!")
 
-@app.route("/history")
-@login_required
-def history():
-    """Show history of transactions"""
-    historydata = db.execute("SELECT * FROM history WHERE user_id = :user_id ORDER BY time DESC", user_id = session["user_id"])
-    for r in historydata:
-        p = r["price"]
-        r["price"] = usd(p)
-    # print(historydata)
-    return render_template("history.html", historydata = historydata)
-    # return apology("TODO")
-
+        # Redirect user to home page
+        return redirect("/login")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -150,12 +103,11 @@ def login():
         session["user_id"] = rows[0]["id"]
 
         # Redirect user to home page
-        return redirect("/")
+        return redirect("/myspace")
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("login.html")
-
 
 @app.route("/logout")
 def logout():
@@ -167,133 +119,147 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
-
-@app.route("/quote", methods=["GET", "POST"])
+@app.route("/myspace", methods=["GET", "POST"])
 @login_required
-def quote():
-    """Get stock quote."""
-    if request.method == "GET":
-        return render_template("quote.html")
-    else:
-        symbol = request.form.get("symbol")
-        if not symbol:
-            return apology("Please input a symbol")
-        price = lookup(symbol)
-        price_usd = usd(price["price"])
-        if not price:
-            return apology("Invalide symbol")
+def myspace():
+    if request.method == "POST":
+        first = db.execute("SELECT * FROM firstcard")
+        if not first:
+            return render_template("firstcard_front.html")
         else:
-            return render_template("quoted.html", price = price, price_usd = price_usd)
-
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    """Register user"""
-    if request.method == "GET":
-        return render_template("register.html")
+            return render_template("card_front.html")
     else:
-        name = request.form.get("username")
-        print(name)
-        if not name:
-            return apology("You must type in a username")
-        # names = db.execute("SELECT username FROM users")
-        names = db.execute("SELECT username FROM users WHERE username = :username", username = name)
-        print(names)
-        # for i in range(len(names)):
-        #     if name == names[i]["username"]:
-        #         return apology("This username already exists")
-        if len(names) != 0:
-            return apology("This username already exists")
-        password = request.form.get("password")
-        if not password:
-            return apology("You must type in a password")
-        confirmation = request.form.get("confirmation")
-        if confirmation != password:
-            return apology("The passwords do not match")
-        userid = db.execute("INSERT INTO users (username, hash) VALUES (:username, :hash)", username = name, hash = generate_password_hash(password))
+        return render_template("myspace.html")
 
-        # Remember which user has logged in
-        session["user_id"] = userid
-
-        # flash("Registered!")
-
-        # Redirect user to home page
-        return redirect("/login")
-
-@app.route("/changepassword", methods=["GET", "POST"])
+@app.route("/firstcard_front", methods=["GET", "POST"])
 @login_required
-def changepassword():
-    """Register user"""
-    if request.method == "GET":
-        return render_template("changepassword.html")
+def firstcard_front():
+    if request.method == "POST":
+        hostschool = request.form.get("school")
+        if not hostschool:
+            return apology("you must select a school")
+        place = request.form.get("place")
+        if not place:
+            return apology("you must type in a place")
+        feeling = request.form.get("feeling")
+        if not feeling:
+            return apology("you must type in a feeling")
+        reason = request.form.get("reason")
+        if not reason:
+            return apology("you must type in a reason")
+        wonder = request.form.get("need")
+        if not wonder:
+            return apology("you must type in your needs")
+        a = db.execute("INSERT INTO firstcard (user_id, hostschool, place, feeling, reason, wonder) VALUES (:user_id, :hostschool, :place, :feeling, :reason, :wonder)", user_id = session["user_id"], hostschool = hostschool, place = place, feeling = feeling, reason = reason, wonder = wonder)
+        print(a)
+        return render_template("card_back.html")
     else:
-        oldpassword = request.form.get("oldpassword")
-        if not oldpassword:
-            return apology("Please type in old password")
-        # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE id = :user_id",
-                          user_id=session["user_id"])
-        # Ensure username exists and password is correct
-        if not check_password_hash(rows[0]["hash"], request.form.get("oldpassword")):
-            return apology("invalid oldpassword")
-        newpassword = request.form.get("newpassword")
-        if not newpassword:
-            return apology("Please type in new password")
-        confirmation = request.form.get("confirmation")
-        if confirmation != newpassword:
-            return apology("The New passwords do not match")
-        db.execute("UPDATE users SET hash = :password_hash WHERE id =:user_id", password_hash = generate_password_hash(newpassword), user_id = session["user_id"])
-        flash("Change password successfully!")
-        return redirect("/")
+        return render_template("firstcard_front.html")
 
-
-
-@app.route("/sell", methods=["GET", "POST"])
+@app.route("/card_back", methods=["GET", "POST"])
 @login_required
-def sell():
-    """Sell shares of stock"""
+def card_back():
     if request.method == "GET":
-        return render_template("sell.html")
-    else:
-        symbol = request.form.get("symbol")
-        if not symbol:
-            return apology("Please type in a symbol")
-        match = db.execute("SELECT symbol FROM history WHERE symbol = :symbol AND user_id =:user_id", symbol = symbol, user_id = session["user_id"])
-        if not match:
-            return apology("You have no share/invalide symbol")
-        shares_value = request.form.get("shares")
-        if not shares_value:
-            return apology("Please type in a number")
-        if not shares_value.isdigit():
-            return apology("Please type in an integer")
+        no = db.execute("SELECT no FROM firstcard WHERE user_id = :user_id", user_id = session["user_id"])
+        first = db.execute("SELECT * FROM firstcard")
+        if not no and not first:
+            return render_template("firstcard_front.html")
+        elif not no:
+            return render_template("card_front.html")
         else:
-            shares = (int)(shares_value)
-        shares_exist = db.execute("SELECT SUM(shares) AS sum_shares FROM history WHERE symbol = :symbol AND user_id =:user_id GROUP BY symbol", symbol = symbol, user_id = session["user_id"])
-        shares_exist_value = shares_exist[0]["sum_shares"]
-        if shares > shares_exist_value:
-            return apology("No enough shares")
-        if shares <= 0:
-            return apology("Please type in a positive integer")
-        #update the history table
-        price = lookup(symbol)
-        price_value = price["price"]
-        cash = db.execute("SELECT cash FROM users WHERE id = :user_id", user_id = session["user_id"])
-        cash_value = cash[0]["cash"]
-        cash_after = cash_value + price_value * shares
-        db.execute("INSERT INTO history(user_id, symbol, shares, price) VALUES (:user_id, :symbol, :shares, :price)", user_id = session["user_id"], symbol = symbol, shares = - shares, price = price_value)
-        db.execute("UPDATE users SET cash = :cash_after WHERE id = :user_id", cash_after = cash_after, user_id = session["user_id"])
+            return render_template("card_back.html")
+    else:
+        cardno = db.execute("SELECT * FROM card")
+        if not cardno:
+            return render_template("firstcard_front.html")
+        else:
+            return render_template("card_front.html")
 
-        flash("Sold successfully!")
-    return redirect("/")
+@app.route("/card_instructions")
+@login_required
+def card_instructions():
+    return render_template("card_instructions.html")
 
+@app.route("/card_back2")
+@login_required
+def card_back2():
+    return render_template("card_back2.html")
 
-def errorhandler(e):
-    """Handle error"""
-    if not isinstance(e, HTTPException):
-        e = InternalServerError()
-    return apology(e.name, e.code)
+@app.route("/card_back3")
+@login_required
+def card_back3():
+    return render_template("card_back3.html")
 
+@app.route("/card_back4")
+@login_required
+def card_back4():
+    return render_template("card_back4.html")
 
-# Listen for errors
-for code in default_exceptions:
-    app.errorhandler(code)(errorhandler)
+@app.route("/card_finished")
+@login_required
+def card_card_finished():
+    return render_template("card_finished.html")
+
+@app.route("/browse")
+@login_required
+def browse():
+    return render_template("browse.html")
+
+@app.route("/bookpage_front")
+@login_required
+def bookpage_front():
+    cards = db.execute("SELECT * FROM firstcard")
+    print(cards)
+    return render_template("bookpage_front.html", cards = cards)
+
+@app.route("/bookpage_back")
+@login_required
+def bookpage_back():
+    return render_template("bookpage_back.html")
+
+@app.route("/search")
+@login_required
+def search():
+    return render_template("search.html")
+
+@app.route("/search_results")
+@login_required
+def search_results():
+    return render_template("search_results.html")
+
+@app.route("/card_front", methods=["GET", "POST"])
+@login_required
+def card_front():
+    if request.method == "POST":
+        text = request.form.get("txt_comments")
+        if not text:
+            return apology("you must type in some texts")
+        else:
+            db.execute("INSERT INTO card (user_id, diary) VALUES (:user_id, :text)", user_id = session["user_id"], text = text)
+            return render_template("card_back.html")
+    else:
+        return render_template("card_front.html")
+
+@app.route("/sunnyroom")
+@login_required
+def sunnyroom():
+    return render_template("sunnyroom.html")
+
+@app.route("/rainyroom")
+@login_required
+def rainyroom():
+    return render_template("rainyroom.html")
+
+@app.route("/hand_waiting")
+@login_required
+def hand_waiting():
+    return render_template("hand_waiting.html")
+
+@app.route("/video")
+def video():
+    return render_template("video.html")
+
+@app.route("/hand_holding")
+@login_required
+def hand_holding():
+    return render_template("hand_holding.html")

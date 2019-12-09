@@ -1,46 +1,20 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Index
+    Welcome
 {% endblock %}
 
 {% block main %}
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Symbol</th>
-                <th>Name</th>
-                <th>Shares</th>
-                <th>Price</th>
-                <th>TOTAL</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for each_symbol in symbol_names%}
-            <tr>
-                <td>{{ each_symbol.symbol }}</td>
-                <td>{{ each_symbol.name }}</td>
-                <td>{{ each_symbol.shares }}</td>
-                <td>{{ each_symbol.price }}</td>
-                <td>{{ each_symbol.total }}</td>
-            </tr>
-        {% endfor %}
-        <tr>
-            <td>CASH</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>{{cash_left}}</td>
-        </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>{{ grandtotal }}</td>
-            </tr>
-        </tfoot>
-    </table>
+	<div class="text_center">
+		<h1>Welcome to (e)motion library</h1>
+		<h2>a virtual mental world</h2>
+	</div>
+	<img src="/static/sofa set.png" alt="sofa set" class="sofaset">
+	<img src="/static/leftwindow.png" alt="left window" class="leftwindow">
+	<img src="/static/rightwindow.png" alt="rightwindow" class="rightwindow">
+	<img src="/static/decorations.png" alt="decorations" class="deco">
+	<div class="text_center" style="position:absolute; top:35%">
+		<p>We hope you enjoy playing around, and find people with similar emotions along the way.</p>
+		<button type="button" onclick="window.location.href = '/login';" style="transform: translate(0%, 60%);" class="button1">Enter</button>
+	</div>
 {% endblock %}
